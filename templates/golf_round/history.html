@@ -1,0 +1,25 @@
+{% extends 'base.html' %} {% block content %}
+<h1>Previous Rounds</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Course</th>
+      <th>Par</th>
+      <th>Score</th>
+      <th>+/-</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for golf_round in golf_rounds %}
+    <tr>
+      <td>{{golf_round.date_played}}</td>
+      <td>{{golf_round.course_name}}</td>
+      <td>{{golf_round.par}}</td>
+      <td>{{golf_round.total_score}}</td>
+      <td>{{golf_round.difference}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

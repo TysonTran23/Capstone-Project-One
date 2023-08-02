@@ -125,7 +125,9 @@ def home_page():
         return render_template("welcome.html")
 
 
-@app.route("/new_golf_round", methods=["GET", "POST"])
+##########################################################
+# Golf Rounds add/edit/get
+@app.route("/golf_round/add", methods=["GET", "POST"])
 def add_golf_round():
     """Handle User Adding New Golf Round"""
     form = AddGolfRoundForm()
@@ -141,6 +143,7 @@ def add_golf_round():
             user_id=g.user.id,
             date_played=date_played,
             course_name=course_name,
+            par=0,
             total_score=0,
         )
 
@@ -149,22 +152,34 @@ def add_golf_round():
         for idx in range(hole_count):
             hole_score = HoleScore(
                 hole_number=idx + 1,
+                par=int(form.hole_scores[idx].par.data),
                 fairway_hit=form.hole_scores[idx].fairway_hit.data,
                 green_in_regulation=form.hole_scores[idx].green_in_regulation.data,
                 putts=form.hole_scores[idx].putts.data,
                 score=form.hole_scores[idx].score.data,
             )
-            #Add each golf hole to GOLF ROUND
+            # Add each golf hole to GOLF ROUND
             golf_round.hole_scores.append(hole_score)
 
-            #Update the total score of the golf round
+            # Track Par of Course
+            golf_round.par += hole_score.par
+            # Update the total score of the golf round
             golf_round.total_score += hole_score.score
 
-            #Add to database
+            # Add to database
             db.session.add(golf_round)
             db.session.commit()
-            
 
         return redirect("/")
 
-    return render_template("golf_round/new_golf_round.html", form=form)
+    return render_template("golf_round/golf_round_add.html", form=form)
+
+
+@app.route("/golf_round/history")
+def previous_rounds():
+    golf_rounds = GolfRound.query.filter_by(user_id=g.user.id).all()
+
+    #
+    for golf_round in golf_rounds:
+        golf_round.difference = golf_round.total_score - golf_round.par
+    return render_template("golf_round/history.html", golf_rounds=golf_rounds)

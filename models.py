@@ -64,11 +64,12 @@ class GolfRound(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     date_played = db.Column(db.Date, nullable=False)
     course_name = db.Column(db.String(100), nullable=False)
+    par = db.Column(db.Integer, nullable=False)
     total_score = db.Column(db.Integer, nullable=False)
 
-    putts_count = db.Column(db.Integer)
-    fairway_hit_count = db.Column(db.Integer)
-    green_hit_count = db.Column(db.Integer)
+    # putts_count = db.Column(db.Integer)
+    # fairway_hit_count = db.Column(db.Integer)
+    # green_hit_count = db.Column(db.Integer)
 
     hole_scores = db.relationship("HoleScore", backref="golf_round", lazy=True)
 
@@ -85,6 +86,7 @@ class HoleScore(db.Model):
         db.Integer, db.ForeignKey("golf_rounds.id"), nullable=False
     )
     hole_number = db.Column(db.Integer, nullable=False)
+    par = db.Column(db.Integer, nullable=False)
     fairway_hit = db.Column(db.Boolean, nullable=False)
     green_in_regulation = db.Column(db.Boolean, nullable=False)
     putts = db.Column(db.Integer, nullable=False)
