@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Golf Round Details</h1>
+    <h2>{{golf_round.date_played}}/{{golf_round.course_name}}</h2>
+    <h3>
+      <a href="/golf_round/{{golf_round.id}}/edit"><button>Edit</button></a>
+    </h3>
+    <h3>
+      <form action="/golf_round/{{golf_round.id}}/delete" method="POST">
+        <button>Delete</button>
+      </form>
+    </h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Hole Number</th>
+          <th>Par</th>
+          <th>Fairway</th>
+          <th>Green in Regulation</th>
+          <th>Putts</th>
+          <th>Score</th>
+          <th>+/-</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in golf_round.hole_scores %}
+        <tr>
+          <td>{{item.hole_number}}</td>
+          <td>{{item.par}}</td>
+          <td>{{item.fairway_hit}}</td>
+          <td>{{item.green_in_regulation}}</td>
+          <td>{{item.putts}}</td>
+          <td>{{item.score}}</td>
+          <td></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

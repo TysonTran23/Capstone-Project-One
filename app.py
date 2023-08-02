@@ -172,14 +172,67 @@ def add_golf_round():
 
         return redirect("/")
 
-    return render_template("golf_round/golf_round_add.html", form=form)
+    return render_template("golf_round/add.html", form=form)
 
 
 @app.route("/golf_round/history")
 def previous_rounds():
+    """Show all previous rounds recorded"""
     golf_rounds = GolfRound.query.filter_by(user_id=g.user.id).all()
 
-    #
+    # Calculates Over/Under Par
     for golf_round in golf_rounds:
         golf_round.difference = golf_round.total_score - golf_round.par
+
     return render_template("golf_round/history.html", golf_rounds=golf_rounds)
+
+
+@app.route("/golf_round/<int:golf_round_id>")
+def golf_round_details(golf_round_id):
+    """Show detail on specific round"""
+    golf_round = GolfRound.query.get_or_404(golf_round_id)
+
+    return render_template("golf_round/details.html", golf_round=golf_round)
+
+
+@app.route("/golf_round/<int:golf_round_id>/edit", methods=["GET", "POST"])
+def golf_round_edit(golf_round_id):
+    """Edit scores"""
+    golf_round = GolfRound.query.get_or_404(golf_round_id)
+
+    form = AddGolfRoundForm(obj=golf_round)
+
+    if form.validate_on_submit():
+        # EDIT Golf Round Information
+        golf_round.date_played = form.date_played.data
+        golf_round.course_name = form.course_name.data
+        golf_round.hole_count = int(form.hole_count.data)
+
+        # EDIT Individual Holes
+        for idx in range(golf_round.hole_count):
+            hole = golf_round.hole_scores[idx]
+            hole.hole_number = idx + 1
+            hole.par = int(form.hole_scores[idx].par.data)
+            hole.fairway_hit = form.hole_scores[idx].fairway_hit.data
+            hole.green_in_regulation = form.hole_scores[idx].green_in_regulation.data
+            hole.putts = form.hole_scores[idx].putts.data
+            hole.score = form.hole_scores[idx].score.data
+
+        db.session.commit()
+
+        return redirect(f"/golf_round/{golf_round_id}")
+        
+    return render_template("golf_round/edit.html", form=form)
+
+@app.route("/golf_round/<int:golf_round_id>/delete", methods=["POST"])
+def delete_golf_round(golf_round_id):
+    
+    golf_round = GolfRound.query.get_or_404(golf_round_id)
+
+    HoleScore.query.filter_by(golf_round_id=golf_round_id).delete()
+
+    db.session.delete(golf_round)
+    db.session.commit()
+
+    return redirect("/golf_round/history")
+
