@@ -1,5 +1,6 @@
 import os
 import pdb
+import time
 
 from flask import Flask, abort, flash, g, redirect, render_template, request, session
 from flask_debugtoolbar import DebugToolbarExtension
@@ -27,7 +28,7 @@ toolbar = DebugToolbarExtension(app)
 connect_db(app)
 
 
-##########################################################
+####################################################################################################################
 # User signup/login/logout
 @app.before_request
 def add_user_to_g():
@@ -35,7 +36,6 @@ def add_user_to_g():
 
     if CURR_USER_KEY in session:
         g.user = User.query.get(session[CURR_USER_KEY])
-
     else:
         g.user = None
 
@@ -92,13 +92,16 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
+        # Authenticate User
         user = User.authenticate(form.username.data, form.password.data)
 
+        # If authentication successful, login
         if user:
             do_login(user)
             flash(f"Hello, {user.username}!", "success")
             return redirect("/")
 
+        # If NOT, Flash error message
         flash("Invalid Credentials", "danger")
 
     return render_template("user/login.html", form=form)
@@ -114,7 +117,7 @@ def logout():
     return redirect("/login")
 
 
-##########################################################
+####################################################################################################################
 
 
 @app.route("/")
@@ -125,11 +128,15 @@ def home_page():
         return render_template("welcome.html")
 
 
-##########################################################
-# Golf Rounds add/edit/get
+####################################################################################################################
+# Golf Rounds Add/Show Previous Rounds/Edit/Delete
 @app.route("/golf_round/add", methods=["GET", "POST"])
 def add_golf_round():
     """Handle User Adding New Golf Round"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
     form = AddGolfRoundForm()
 
     if form.validate_on_submit():
@@ -178,6 +185,10 @@ def add_golf_round():
 @app.route("/golf_round/history")
 def previous_rounds():
     """Show all previous rounds recorded"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
     golf_rounds = GolfRound.query.filter_by(user_id=g.user.id).all()
 
     # Calculates Over/Under Par
@@ -190,6 +201,9 @@ def previous_rounds():
 @app.route("/golf_round/<int:golf_round_id>")
 def golf_round_details(golf_round_id):
     """Show detail on specific round"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
     golf_round = GolfRound.query.get_or_404(golf_round_id)
 
     return render_template("golf_round/details.html", golf_round=golf_round)
@@ -198,8 +212,12 @@ def golf_round_details(golf_round_id):
 @app.route("/golf_round/<int:golf_round_id>/edit", methods=["GET", "POST"])
 def golf_round_edit(golf_round_id):
     """Edit scores"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
     golf_round = GolfRound.query.get_or_404(golf_round_id)
 
+    # Prepopulate Form
     form = AddGolfRoundForm(obj=golf_round)
 
     if form.validate_on_submit():
@@ -217,22 +235,37 @@ def golf_round_edit(golf_round_id):
             hole.green_in_regulation = form.hole_scores[idx].green_in_regulation.data
             hole.putts = form.hole_scores[idx].putts.data
             hole.score = form.hole_scores[idx].score.data
-
+        # Add to DB
         db.session.commit()
 
         return redirect(f"/golf_round/{golf_round_id}")
-        
+
     return render_template("golf_round/edit.html", form=form)
+
 
 @app.route("/golf_round/<int:golf_round_id>/delete", methods=["POST"])
 def delete_golf_round(golf_round_id):
-    
+    """Delete Golf Round"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    # Get golf round
     golf_round = GolfRound.query.get_or_404(golf_round_id)
 
+    # Delete associated holes with golf round first
     HoleScore.query.filter_by(golf_round_id=golf_round_id).delete()
 
+    # Delete golf round
     db.session.delete(golf_round)
     db.session.commit()
 
     return redirect("/golf_round/history")
 
+
+####################################################################################################################
+
+
+# GOLF BLOG API's
+@app.route("/golf_blog")
+def show_blog():
+    return render_template("/golf_blog/blog.html", time=time.time())
