@@ -302,6 +302,6 @@ def delete_golf_round(golf_round_id):
 
 
 # GOLF BLOG API's
-@app.route("/golf_blog")
+@app.route("/golf_news")
 def show_blog():
-    return render_template("/golf_blog/blog.html", time=time.time())
+    return render_template("/golf_news/home.html", time=time.time())
