@@ -47,8 +47,24 @@ class AddGolfRoundForm(FlaskForm):
     course_name = StringField("Course Name", validators=[InputRequired()])
     hole_count = SelectField(
         "Number of Holes",
-        choices=[("9", "9 Holes"), ("18", "18 Holes")],
+        choices=[("9", "9 Holes")],
         validators=[InputRequired()],
     )
     hole_scores = FieldList(FormField(HoleScoreForm), min_entries=9, max_entries=18)
     submit = SubmitField("Submit Round")
+
+
+
+class AddGolfRoundForm18(FlaskForm):
+    """Form for adding Golf Round"""
+
+    date_played = DateField("Date Played", validators=[InputRequired()])
+    course_name = StringField("Course Name", validators=[InputRequired()])
+    hole_count = SelectField(
+        "Number of Holes",
+        choices=[("18", "18 Holes")],
+        validators=[InputRequired()],
+    )
+    hole_scores = FieldList(FormField(HoleScoreForm), min_entries=18, max_entries=18)
+    submit = SubmitField("Submit Round")
+

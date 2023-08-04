@@ -6,7 +6,13 @@ from flask import Flask, abort, flash, g, redirect, render_template, request, se
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-from forms import AddGolfRoundForm, AddUserForm, HoleScoreForm, LoginForm
+from forms import (
+    AddGolfRoundForm,
+    AddGolfRoundForm18,
+    AddUserForm,
+    HoleScoreForm,
+    LoginForm,
+)
 from models import GolfRound, Handicap, HoleScore, User, connect_db, db
 
 CURR_USER_KEY = "curr_user"
@@ -129,9 +135,49 @@ def home_page():
 
 
 ####################################################################################################################
+# Standalone Functions for Golf Rounds
+def create_golf_round(user_id, date_played, course_name):
+    """Create a GolfRound Instace and save it to database"""
+    golf_round = GolfRound(
+        user_id=user_id,
+        date_played=date_played,
+        course_name=course_name,
+        par=0,
+        total_score=0,
+    )
+    db.session.add(golf_round)
+    db.session.commit()
+
+    return golf_round
+
+
+def save_hole_scores(golf_round, hole_scores_form, hole_count):
+    """Save hole scores to the database for the given golf round"""
+    for idx in range(hole_count):
+        hole_score = HoleScore(
+            hole_number=idx + 1,
+            par=int(hole_scores_form[idx].par.data),
+            fairway_hit=hole_scores_form[idx].fairway_hit.data,
+            green_in_regulation=hole_scores_form[idx].green_in_regulation.data,
+            putts=hole_scores_form[idx].putts.data,
+            score=hole_scores_form[idx].score.data,
+        )
+        # Add each golf hole to GOLF ROUND
+        golf_round.hole_scores.append(hole_score)
+
+        # Track Par of Course
+        golf_round.par += hole_score.par
+        # Update the total score of the golf round
+        golf_round.total_score += hole_score.score
+
+        # Add to database
+    db.session.commit()
+
+
+#####################################################
 # Golf Rounds Add/Show Previous Rounds/Edit/Delete
-@app.route("/golf_round/add", methods=["GET", "POST"])
-def add_golf_round():
+@app.route("/golf_round/add9", methods=["GET", "POST"])
+def add_golf_round9():
     """Handle User Adding New Golf Round"""
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -140,42 +186,32 @@ def add_golf_round():
     form = AddGolfRoundForm()
 
     if form.validate_on_submit():
-        # Golf Round Information
-        date_played = form.date_played.data
-        course_name = form.course_name.data
         hole_count = int(form.hole_count.data)
-
-        # Create Golf Round Instance
-        golf_round = GolfRound(
-            user_id=g.user.id,
-            date_played=date_played,
-            course_name=course_name,
-            par=0,
-            total_score=0,
+        golf_round = create_golf_round(
+            g.user.id, form.date_played.data, form.course_name.data
         )
+        save_hole_scores(golf_round, form.hole_scores, hole_count)
 
-        # Retrieving data for individual holes from forms
-        # Create Each Golf Hole Instance
-        for idx in range(hole_count):
-            hole_score = HoleScore(
-                hole_number=idx + 1,
-                par=int(form.hole_scores[idx].par.data),
-                fairway_hit=form.hole_scores[idx].fairway_hit.data,
-                green_in_regulation=form.hole_scores[idx].green_in_regulation.data,
-                putts=form.hole_scores[idx].putts.data,
-                score=form.hole_scores[idx].score.data,
-            )
-            # Add each golf hole to GOLF ROUND
-            golf_round.hole_scores.append(hole_score)
+        return redirect("/")
 
-            # Track Par of Course
-            golf_round.par += hole_score.par
-            # Update the total score of the golf round
-            golf_round.total_score += hole_score.score
+    return render_template("golf_round/add.html", form=form)
 
-            # Add to database
-            db.session.add(golf_round)
-            db.session.commit()
+
+@app.route("/golf_round/add18", methods=["GET", "POST"])
+def add_golf_round18():
+    """Handle User Adding New Golf Round (18 HOLES)"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    form = AddGolfRoundForm18()
+
+    if form.validate_on_submit():
+        hole_count = int(form.hole_count.data)
+        golf_round = create_golf_round(
+            g.user.id, form.date_played.data, form.course_name.data
+        )
+        save_hole_scores(golf_round, form.hole_scores, hole_count)
 
         return redirect("/")
 
