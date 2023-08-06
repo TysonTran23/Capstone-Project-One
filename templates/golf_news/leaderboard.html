@@ -1,0 +1,50 @@
+{% extends 'base.html'%} {% block content %}
+<h1>Leaderboard</h1>
+<div id="tournament-leaderboardcontainer">
+  <h2>Current Leaderboard</h2>
+  <h4></h4>
+  <table id="tournament-leaderboard-table">
+    <thead>
+      <tr>
+        <th>Position</th>
+        <th>Player</th>
+        <th>Total</th>
+        <th>R1</th>
+        <th>R2</th>
+        <th>R3</th>
+        <th>R4</th>
+      </tr>
+    </thead>
+    <tbody id="tournament-leaderboard-body">
+      {% for player in leaderboard_data['Players'] %}
+      <tr>
+        <td>{{player['Rank']}}</td>
+        <td>{{player['Name']}}</td>
+        <td>{{player['TotalScore']}}</td>
+
+        {% if player['Rounds'][0] %}
+        <td>{{player['Rounds'][0]['Score']}}</td>
+        {% else %}
+        <td>-</td>
+        {% endif %}
+        {% if player['Rounds'][1] %}
+        <td>{{player['Rounds'][1]['Score']}}</td>
+        {% else %}
+        <td>-</td>
+        {% endif %}
+        {% if player['Rounds'][2] %}
+        <td>{{player['Rounds'][2]['Score']}}</td>
+        {% else %}
+        <td>-</td>
+        {% endif %}
+        {% if player['Rounds'][3] %}
+        <td>{{player['Rounds'][3]['Score']}}</td>
+        {% else %}
+        <td>-</td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

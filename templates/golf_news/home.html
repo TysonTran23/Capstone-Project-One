@@ -1,16 +1,15 @@
 {% extends 'base.html' %} {% block content %}
 <h1>Golf News</h1>
 <nav id="golf-news-navbar">
-  <a href="">PGA Tour Schedule</a>
-  <a href="">Current Tournament</a>
+  <a href="/golf_news/schedule">PGA Tour Schedule</a>
 </nav>
 <div id="todays-news-container">
   <h2>Todays News</h2>
 </div>
 <div id="current-tournament-container">
-<h2>Current Leaderboard</h2>
-<h4></h4>
-  <table>
+  <h2>Current Leaderboard</h2>
+  <h4></h4>
+  <table id="current-tournament-table">
     <thead>
       <tr>
         <th>Position</th>
@@ -22,9 +21,13 @@
         <th>R4</th>
       </tr>
     </thead>
-    <tbody id="leaderboard-body">
-
-    </tbody>
+    <tbody id="leaderboard-body"></tbody>
   </table>
 </div>
+<div id="next-tournament-container">
+  <h2>Next Tournament</h2>
+  <h4></h4>
+<ul id="next-tournament-list"></ul>
+</div>
 {% endblock %}
+

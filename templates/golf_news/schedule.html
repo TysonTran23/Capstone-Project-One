@@ -1,0 +1,42 @@
+{% extends 'base.html' %} {% block content %}
+<h1>PGA Tour Schedule</h1>
+
+<nav><a href=""></a></nav>
+<div id="pga-schedule-container">
+  <table id="pga-schedule-table">
+    <thead>
+      <tr>
+        <th>Tournament Name</th>
+        <th>Par</th>
+        <th>Location</th>
+        <th>Venue</th>
+        <th>Purse($)</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+      </tr>
+    </thead>
+    <tbody id="pga-schedule-body">
+      {% for tournament in tournaments %}
+      <tr>
+        <td>
+          <a
+            href="{{url_for('show_tournament_leaderboard', tournament_id=tournament.TournamentID)}}"
+            >{{tournament.Name}}</a
+          >
+        </td>
+        {% if tournament.Par == None %}
+        <td>-</td>
+        {% else %}
+        <td>{{tournament.Par}}</td>
+        {% endif %}
+        <td>{{tournament.Location}}</td>
+        <td>{{tournament.Venue}}</td>
+        <td>{{tournament.Purse}}</td>
+        <td>{{tournament.StartDate}}</td>
+        <td>{{tournament.EndDate}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

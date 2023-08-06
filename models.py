@@ -107,7 +107,6 @@ class Handicap(db.Model):
     def __repr__(self):
         return f"<User #{self.user_id} Handicap: {self.value}>"
 
-
 def connect_db(app):
     db.app = app
     db.init_app(app)

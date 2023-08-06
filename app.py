@@ -2,6 +2,7 @@ import os
 import pdb
 import time
 
+import requests
 from flask import Flask, abort, flash, g, redirect, render_template, request, session
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
@@ -16,6 +17,9 @@ from forms import (
 from models import GolfRound, Handicap, HoleScore, User, connect_db, db
 
 CURR_USER_KEY = "curr_user"
+BASE_URL = "https:api.sportsdata.io/golf/v2/json"
+URL_KEY = "key=176964ab9ddb48dea44c9fb38e4adbc8"
+
 
 app = Flask(__name__)
 
@@ -303,5 +307,27 @@ def delete_golf_round(golf_round_id):
 
 # GOLF BLOG API's
 @app.route("/golf_news")
-def show_blog():
+def show_golf_news():
+    """Display Golf News Home Page"""
     return render_template("/golf_news/home.html", time=time.time())
+
+
+@app.route("/golf_news/schedule")
+def show_PGA_schedule():
+    """Display PGA schedule base on season"""
+
+    # Fetch PGA schedule data from API
+    # response = requests.get(f"{BASE_URL}/Tournaments/2023?{URL_KEY}")
+    response = requests.get("https://api.sportsdata.io/golf/v2/json/Tournaments/2023?key=176964ab9ddb48dea44c9fb38e4adbc8")
+    tournaments = response.json()
+    return render_template("golf_news/schedule.html", time=time.time(), tournaments=tournaments)
+
+
+@app.route("/golf_news/leaderboard/<int:tournament_id>")
+def show_tournament_leaderboard(tournament_id):
+    """Display Leaderboard of tournament"""
+
+    # Fetch leaderboard data for the specified tournament from API
+    response = requests.get(f"https://api.sportsdata.io/golf/v2/json/Leaderboard/{tournament_id}?key=176964ab9ddb48dea44c9fb38e4adbc8")
+    leaderboard_data = response.json()
+    return render_template("golf_news/leaderboard.html", leaderboard_data=leaderboard_data)
