@@ -1,3 +1,4 @@
+import datetime
 import os
 import pdb
 import time
@@ -19,6 +20,7 @@ from models import GolfRound, Handicap, HoleScore, User, connect_db, db
 CURR_USER_KEY = "curr_user"
 BASE_URL = "https:api.sportsdata.io/golf/v2/json"
 URL_KEY = "key=176964ab9ddb48dea44c9fb38e4adbc8"
+CURRENT_YEAR = datetime.datetime.now().year
 
 
 app = Flask(__name__)
@@ -318,9 +320,13 @@ def show_PGA_schedule():
 
     # Fetch PGA schedule data from API
     # response = requests.get(f"{BASE_URL}/Tournaments/2023?{URL_KEY}")
-    response = requests.get("https://api.sportsdata.io/golf/v2/json/Tournaments/2023?key=176964ab9ddb48dea44c9fb38e4adbc8")
+    response = requests.get(
+        f"https://api.sportsdata.io/golf/v2/json/Tournaments/{CURRENT_YEAR}?key=176964ab9ddb48dea44c9fb38e4adbc8"
+    )
     tournaments = response.json()
-    return render_template("golf_news/schedule.html", time=time.time(), tournaments=tournaments)
+    return render_template(
+        "golf_news/schedule.html", time=time.time(), tournaments=tournaments
+    )
 
 
 @app.route("/golf_news/leaderboard/<int:tournament_id>")
@@ -328,6 +334,40 @@ def show_tournament_leaderboard(tournament_id):
     """Display Leaderboard of tournament"""
 
     # Fetch leaderboard data for the specified tournament from API
-    response = requests.get(f"https://api.sportsdata.io/golf/v2/json/Leaderboard/{tournament_id}?key=176964ab9ddb48dea44c9fb38e4adbc8")
+    response = requests.get(
+        f"https://api.sportsdata.io/golf/v2/json/Leaderboard/{tournament_id}?key=176964ab9ddb48dea44c9fb38e4adbc8"
+    )
     leaderboard_data = response.json()
-    return render_template("golf_news/leaderboard.html", leaderboard_data=leaderboard_data)
+    return render_template(
+        "golf_news/leaderboard.html", leaderboard_data=leaderboard_data
+    )
+
+
+@app.route("/golf_news/current_leaderboard")
+def show_current_leaderboard():
+    """Display Current Tournament Leaderboard"""
+    return render_template("golf_news/current_leaderboard.html", time=time.time())
+
+
+@app.route("/golf_news/world_rankings")
+def show_world_rankings():
+    """Display World Rankings"""
+    response = requests.get(
+        f"https://api.sportsdata.io/golf/v2/json/PlayerSeasonStats/{CURRENT_YEAR}?key=176964ab9ddb48dea44c9fb38e4adbc8"
+    )
+    rankings = response.json()
+    return render_template(
+        "golf_news/world_rankings.html", rankings=rankings, time=time.time()
+    )
+
+
+@app.route("/golf_news/player/<int:player_id>")
+def show_player_details(player_id):
+    """Display Player Details"""
+    response = requests.get(
+        f"https://api.sportsdata.io/golf/v2/json/Player/{player_id}?key=176964ab9ddb48dea44c9fb38e4adbc8"
+    )
+    response2 = requests.get(f"https://api.sportsdata.io/golf/v2/json/NewsByPlayerID/{player_id}?key=176964ab9ddb48dea44c9fb38e4adbc8")
+    player = response.json()
+    news = response2.json()
+    return render_template("golf_news/player.html", player=player, news=news)

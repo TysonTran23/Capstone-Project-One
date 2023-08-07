@@ -1,0 +1,19 @@
+{% extends 'base.html' %} {% block content %}
+<h1>{{player.FirstName}} {{player.LastName}}</h1>
+<img src="{{player.PhotoUrl}}" alt="" />
+
+<ul>
+    <li>{{player.BirthCity}}, {{player.BirthState}} {{player.Country}}</li>
+    <li>College: {{player.College}}</li>
+    <li>Swings: {{player.Swings}}</li>
+    <li>Weight: {{player.Weight}}</li>
+    <li>PgaDebut: {{player.Weight}}</li>
+</ul>
+<h2>Current News</h2>
+{% for item in news %}
+<h4>{{item.Title}}</h4>
+<p>{{item.Updated}}</p>
+<p>Sources: <a href="{{item.OriginalSourceUrl}}">{{item.OriginalSource}}</a>, <a href="{{item.Url}}">{{item.Source}}</a></p>
+<p>{{item.Content}}</p>
+{% endfor %}
+{% endblock %}

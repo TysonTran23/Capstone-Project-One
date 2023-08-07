@@ -1,0 +1,30 @@
+{% extends 'base.html' %} {% block content %}
+<h1>World Rankings</h1>
+<div id="world_rankings-container">
+  <table id="world_rankings-table">
+    <thead>
+      <tr>
+        <th>Golfer</th>
+        <th>World Golf Ranking</th>
+        <th>World Golf Ranking (Last Week)</th>
+        <th>Events</th>
+        <th>Average Points</th>
+        <th>Total Points</th>
+      </tr>
+    </thead>
+    <tbody id="world_rankings-body">
+      {% for player in rankings %}
+      <tr>
+        <td><a href="{{url_for('show_player_details', player_id=player.PlayerID)}}">{{player.Name}}</a></td>
+        <td>{{player.WorldGolfRank}}</td>
+        <td>{{player.WorldGolfRankLastWeek}}</td>
+        <td>{{player.Events}}</td>
+        <td>{{player.AveragePoints}}</td>
+        <td>{{player.TotalPoints}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

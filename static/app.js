@@ -1,5 +1,7 @@
 const BASE_URL = "https:api.sportsdata.io/golf/v2/json";
 const URL_KEY = "key=176964ab9ddb48dea44c9fb38e4adbc8";
+const currentDate = new Date();
+const CURRENTYEAR = currentDate.getFullYear();
 
 const blogContainer = document.getElementById("blog-container");
 
@@ -68,10 +70,17 @@ async function getLeaderboard() {
   const tournament = response.data.Tournament.Name;
 
   const tournamentName = $("#current-tournament-container").find("h4");
+  const currentTournament = $("#current-leaderboard-container").find("h2");
   tournamentName.text(tournament);
+  currentTournament.text(tournament);
+
   for (let i = 0; i < 5; i++) {
     let player = $(generateLeaderboardHTML(players[i]));
     $("#leaderboard-body").append(player);
+  }
+  for (let item of players) {
+    let player = $(generateLeaderboardHTML(item));
+    $("#current-leaderboard-body").append(player);
   }
 }
 
@@ -110,29 +119,29 @@ getLeaderboard();
 getNextTournament();
 
 /////////////////////////////////////////////////////////////////////////////////////////
-function generatePGAScheduleHTML(data) {
-  return `
-  <tr>
-  <td><a href="/golf_news/leaderboard">${data.Name}</a></td>
-  <td>${data.Par}</td>
-  <td>${data.Location}</td>
-  <td>${data.Venue}</td>
-  <td>${data.Purse}</td>
-  <td>${data.StartDate}</td>
-  <td>${data.EndDate}</td>
-  </tr>
-  `;
-}
 
-// async function getPGASchedule() {
-//   const response = await axios.get(`${BASE_URL}/Tournaments/2023?${URL_KEY}`);
-//   console.log(response.data);
+// function generateWorldRankingsHTML(data) {
+//   return `
+//   <tr>
+//   <td>${data.Name}</td>
+//   <td>${data.WorldGolfRank}</td>
+//   <td>${data.WorldGolfRankLastWeek}</td>
+//   <td>${data.Events}</td>
+//   <td>${data.AveragePoints}</td>
+//   <td>${data.TotalPoints}</td>
+//   </tr>`;
+// }
+
+// async function getWorldRankings() {
+//   const response = await axios.get(
+//     `${BASE_URL}/PlayerSeasonStats/${CURRENTYEAR}?${URL_KEY}`
+//   );
 //   data = response.data;
-//   for (let item of data) {
-//     let info = $(generatePGAScheduleHTML(item));
-//     let tournamentid = item.TournamentID;
-//     $("#pga-schedule-body").append(info);
+//   console.log(data);
+//   for (let player of data) {
+//     let golfer = $(generateWorldRankingsHTML(player));
+//     $("#world_rankings-body").append(golfer);
 //   }
 // }
-// getPGASchedule();
-/////////////////////////////////////////////////////////////////////////////////////////
+
+// getWorldRankings()
