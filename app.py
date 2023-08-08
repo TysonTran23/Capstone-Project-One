@@ -283,7 +283,11 @@ def scores(user_id):
 @app.route("/")
 def home_page():
     if g.user:
-        avg_scores = calculate_average_scores(g.user.id)
+
+        golf_rounds = GolfRound.query.filter_by(user_id=g.user.id).order_by(GolfRound.date_played.desc()).limit(5).all()
+        for golf_round in golf_rounds:
+            golf_round.difference = golf_round.total_score - golf_round.par
+
 
         return render_template(
             "home.html",
@@ -293,6 +297,7 @@ def home_page():
             last_10_round_putts=calculate_putts_per_round(g.user.id),
             avg_scores=calculate_average_scores(g.user.id),
             scores=scores(g.user.id),
+            golf_rounds=golf_rounds,
             time=time.time(),
         )
     else:
