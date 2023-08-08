@@ -119,29 +119,3 @@ getLeaderboard();
 getNextTournament();
 
 /////////////////////////////////////////////////////////////////////////////////////////
-
-// function generateWorldRankingsHTML(data) {
-//   return `
-//   <tr>
-//   <td>${data.Name}</td>
-//   <td>${data.WorldGolfRank}</td>
-//   <td>${data.WorldGolfRankLastWeek}</td>
-//   <td>${data.Events}</td>
-//   <td>${data.AveragePoints}</td>
-//   <td>${data.TotalPoints}</td>
-//   </tr>`;
-// }
-
-// async function getWorldRankings() {
-//   const response = await axios.get(
-//     `${BASE_URL}/PlayerSeasonStats/${CURRENTYEAR}?${URL_KEY}`
-//   );
-//   data = response.data;
-//   console.log(data);
-//   for (let player of data) {
-//     let golfer = $(generateWorldRankingsHTML(player));
-//     $("#world_rankings-body").append(golfer);
-//   }
-// }
-
-// getWorldRankings()

@@ -6,6 +6,7 @@ import time
 import requests
 from flask import Flask, abort, flash, g, redirect, render_template, request, session
 from flask_debugtoolbar import DebugToolbarExtension
+from sqlalchemy import case, func
 from sqlalchemy.exc import IntegrityError
 
 from forms import (
@@ -132,10 +133,168 @@ def logout():
 ####################################################################################################################
 
 
+def last_10_rounds():
+    """Retrieve last 10 rounds of User"""
+    rounds = GolfRound.query.filter_by(user_id=g.user.id)
+
+    return [round.total_score for round in rounds][-10:]
+
+
+def calculate_fairway_percentage(user_id):
+    fairway_hit_count = (
+        db.session.query(func.sum(case([(HoleScore.fairway_hit == True, 1)], else_=0)))
+        .join(GolfRound)
+        .filter(GolfRound.user_id == user_id)
+        .scalar()
+    )
+    total_holes_played = (
+        db.session.query(func.count(HoleScore.id))
+        .join(GolfRound)
+        .filter(GolfRound.user_id == user_id)
+        .scalar()
+    )
+
+    fairway_percentage = (
+        (fairway_hit_count / total_holes_played) * 100 if total_holes_played > 0 else 0
+    )
+
+    return round(fairway_percentage, 2)
+
+
+def calculate_greens_in_regulation(user_id):
+    green_in_regulation = (
+        db.session.query(
+            func.sum(case([(HoleScore.green_in_regulation == True, 1)], else_=0))
+        )
+        .join(GolfRound)
+        .filter(GolfRound.user_id == user_id)
+        .scalar()
+    )
+
+    total_holes_played = (
+        db.session.query(func.count(HoleScore.id))
+        .join(GolfRound)
+        .filter(GolfRound.user_id == user_id)
+        .scalar()
+    )
+
+    green_in_regulation_percentage = (
+        (green_in_regulation / total_holes_played) * 100
+        if total_holes_played > 0
+        else 0
+    )
+
+    return round(green_in_regulation_percentage, 2)
+
+
+def calculate_putts_per_round(user_id):
+    last_10_rounds_putts = (
+        db.session.query(func.sum(HoleScore.putts))
+        .join(GolfRound)
+        .filter(GolfRound.user_id == user_id)
+        .group_by(GolfRound.id)
+        .order_by(GolfRound.date_played.desc())
+        .limit(10)
+        .all()
+    )
+
+    last_10_rounds_putts = [total_putts for (total_putts,) in last_10_rounds_putts]
+
+    return last_10_rounds_putts
+
+
+def calculate_average_scores(user_id):
+    avg_score_18 = (
+        db.session.query(func.avg(GolfRound.total_score))
+        .filter(GolfRound.user_id == user_id)
+        .scalar()
+    )
+    avg_score_9 = (
+        db.session.query(func.avg(GolfRound.total_score / 2))
+        .filter(GolfRound.user_id == user_id)
+        .scalar()
+    )
+
+    avg_par_3 = (
+        db.session.query(func.avg(HoleScore.score))
+        .join(GolfRound)
+        .filter(GolfRound.user_id == user_id, HoleScore.par == 3)
+        .scalar()
+    )
+    avg_par_4 = (
+        db.session.query(func.avg(HoleScore.score))
+        .join(GolfRound)
+        .filter(GolfRound.user_id == user_id, HoleScore.par == 4)
+        .scalar()
+    )
+    avg_par_5 = (
+        db.session.query(func.avg(HoleScore.score))
+        .join(GolfRound)
+        .filter(GolfRound.user_id == user_id, HoleScore.par == 5)
+        .scalar()
+    )
+
+    return (
+        round(avg_score_18, 2),
+        round(avg_score_9, 2),
+        round(avg_par_3, 2),
+        round(avg_par_4, 2),
+        round(avg_par_5, 2),
+    )
+
+
+def scores(user_id):
+    golf_rounds = GolfRound.query.filter_by(user_id=g.user.id).all()
+
+    hole_scores_and_pars = (db.session.query(HoleScore.score, HoleScore.par)
+    .join(GolfRound)
+    .filter(GolfRound.user_id == user_id)
+    .all()
+    )
+    categories = {
+    "eagles": 0,
+    "birdies": 0,
+    "pars": 0,
+    "bogies": 0,
+    "double_bogies": 0,
+    "triples": 0,
+    "double_pars": 0,
+}
+    for score, par in hole_scores_and_pars:
+        score_difference = score - par
+
+        if score_difference <= -2:
+            categories["eagles"] += 1
+        elif score_difference == -1:
+            categories["birdies"] += 1
+        elif score_difference == 0:
+            categories["pars"] += 1
+        elif score_difference == 1:
+            categories["bogies"] += 1
+        elif score_difference == 2:
+            categories["double_bogies"] += 1
+        elif score_difference == 3:
+            categories["triples"] += 1
+        elif score_difference >= 4:
+            categories["double_pars"] += 1
+
+    return categories
+
 @app.route("/")
 def home_page():
     if g.user:
-        return render_template("home.html")
+        avg_scores = calculate_average_scores(g.user.id)
+
+        return render_template(
+            "home.html",
+            last_10_score=last_10_rounds(),
+            fairway_hit_percentage=calculate_fairway_percentage(g.user.id),
+            green_in_regulation=calculate_greens_in_regulation(g.user.id),
+            last_10_round_putts=calculate_putts_per_round(g.user.id),
+            avg_scores=calculate_average_scores(g.user.id),
+            scores=scores(g.user.id),
+            time=time.time(),
+        )
     else:
         return render_template("welcome.html")
 
@@ -367,7 +526,12 @@ def show_player_details(player_id):
     response = requests.get(
         f"https://api.sportsdata.io/golf/v2/json/Player/{player_id}?key=176964ab9ddb48dea44c9fb38e4adbc8"
     )
-    response2 = requests.get(f"https://api.sportsdata.io/golf/v2/json/NewsByPlayerID/{player_id}?key=176964ab9ddb48dea44c9fb38e4adbc8")
+    response2 = requests.get(
+        f"https://api.sportsdata.io/golf/v2/json/NewsByPlayerID/{player_id}?key=176964ab9ddb48dea44c9fb38e4adbc8"
+    )
     player = response.json()
     news = response2.json()
     return render_template("golf_news/player.html", player=player, news=news)
+
+
+####################################################################################################################

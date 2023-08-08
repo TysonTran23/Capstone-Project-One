@@ -54,7 +54,6 @@ class AddGolfRoundForm(FlaskForm):
     submit = SubmitField("Submit Round")
 
 
-
 class AddGolfRoundForm18(FlaskForm):
     """Form for adding Golf Round"""
 
@@ -67,4 +66,3 @@ class AddGolfRoundForm18(FlaskForm):
     )
     hole_scores = FieldList(FormField(HoleScoreForm), min_entries=18, max_entries=18)
     submit = SubmitField("Submit Round")
-
