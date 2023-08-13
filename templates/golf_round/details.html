@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Golf Round Details</h1>
-<h2>{{golf_round.date_played}}/{{golf_round.course_name}}</h2>
+<h5>{{golf_round.date_played}}/{{golf_round.course_name}}</h5>
 <h3>
-  <a href="/golf_round/{{golf_round.id}}/edit"><button>Edit</button></a>
+  <a href="/golf_round/{{golf_round.id}}/edit"><button class="btn btn-info">Edit</button></a>
 </h3>
 <h3>
   <form action="/golf_round/{{golf_round.id}}/delete" method="POST">
-    <button>Delete</button>
+    <button class="btn btn-danger">Delete</button>
   </form>
 </h3>
 <table>

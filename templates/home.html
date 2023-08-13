@@ -4,34 +4,30 @@
 <div class="row">
   <!-- Putts per Round Card -->
   <div class="col-md-6">
-      <div class="card mb-4">
-          <div class="card-header bg-primary text-white">
-              <h5 class="mb-0">Putts per Round</h5>
-          </div>
-          <ul class="list-group list-group-flush">
-              {% for putt in last_10_round_putts %}
-              <li class="list-group-item">
-                  {{ loop.index }}: {{ putt }} putts
-              </li>
-              {% endfor %}
-          </ul>
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Putts per Round</h5>
       </div>
+      <ul class="list-group list-group-flush">
+        {% for putt in last_10_round_putts %}
+        <li class="list-group-item">{{ loop.index }}: {{ putt }} putts</li>
+        {% endfor %}
+      </ul>
+    </div>
   </div>
 
   <!-- Last 10 Round Scores Card -->
   <div class="col-md-6">
-      <div class="card">
-          <div class="card-header bg-success text-white">
-              <h5 class="mb-0">Last 10 Round Scores</h5>
-          </div>
-          <ul class="list-group list-group-flush">
-              {% for score in last_10_score %}
-              <li class="list-group-item">
-                  {{ loop.index }}: {{ score }} strokes
-              </li>
-              {% endfor %}
-          </ul>
+    <div class="card">
+      <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Last 10 Round Scores</h5>
       </div>
+      <ul class="list-group list-group-flush">
+        {% for score in last_10_score %}
+        <li class="list-group-item">{{ loop.index }}: {{ score }} strokes</li>
+        {% endfor %}
+      </ul>
+    </div>
   </div>
 </div>
 

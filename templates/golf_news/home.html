@@ -1,44 +1,68 @@
 {% extends 'base.html' %} {% block content %}
-<h1 class="display-2 text-center">Golf News</h1>
-<nav class="navbar navbar-expand-lg" id="golf-news-navbar">
+
+<style>
+  /* Custom Styling */
+  #golf-news-navbar,
+  #todays-news-container {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  }
+  .nav-link:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+  }
+  .table th {
+    background-color: #303030;
+    color: white;
+  }
+</style>
+
+<h1 class="display-2 text-center mb-5">Golf News</h1>
+
+<nav class="navbar navbar-expand-lg rounded-navbar mb-4" id="golf-news-navbar">
   <div class="container-fluid justify-content-center">
     <ul class="navbar-nav justify-content-center">
       <li class="nav-item">
         <a
           href="/golf_news/schedule"
-          class="nav-link active btn btn-outline-primary mr-2"
-          >PGA Tour Schedule</a
+          class="nav-link active btn btn-outline-dark mr-2"
         >
+          <i class="fas fa-calendar-alt mr-2"></i>PGA Tour Schedule
+        </a>
       </li>
       <li class="nav-item">
         <a
           href="/golf_news/current_leaderboard"
-          class="nav-link active btn btn-outline-primary mr-2"
-          >Current Leaderboard</a
+          class="nav-link active btn btn-outline-dark mr-2"
         >
+          <i class="fas fa-list-ol mr-2"></i>Current Leaderboard
+        </a>
       </li>
       <li class="nav-item">
         <a
           href="/golf_news/world_rankings"
-          class="nav-link active btn btn-outline-primary mr-2"
-          >World Rankings</a
+          class="nav-link active btn btn-outline-dark mr-2"
         >
+          <i class="fas fa-globe-americas mr-2"></i>World Rankings
+        </a>
       </li>
     </ul>
   </div>
 </nav>
 
-<div id="todays-news-container">
-  <h2 class="text-center display-4">Todays News</h2>
+<div id="todays-news-container" class="mb-5">
+  <h2 class="text-center display-4">Today's News</h2>
 </div>
 
 <div class="container my-4">
   <div class="row my-4">
-    <div class="col-lg-6">
+    <div class="col-lg-6 mb-4">
       <div id="current-tournament-container">
         <h2>Current Leaderboard</h2>
         <h4></h4>
-        <table id="current-tournament-table" class="table table=striped">
+        <table id="current-tournament-table" class="table table-striped">
           <thead>
             <tr>
               <th>Position</th>
@@ -63,4 +87,5 @@
     </div>
   </div>
 </div>
+
 {% endblock %}

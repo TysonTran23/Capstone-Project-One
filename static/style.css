@@ -7,7 +7,7 @@
 
 body {
   font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
+  background-color: #f4f4f4;
   color: #333;
   line-height: 1.6;
   margin: 0;
@@ -16,6 +16,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  font-family: "Lato", sans-serif;
 }
 .main-content {
   max-width: 1000px; /* This can be adjusted based on your preferred width */
@@ -28,6 +29,7 @@ body {
   overflow: hidden;
   padding: 10px 20px;
   margin-bottom: 20px;
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
 }
 
 .topnav a {
@@ -173,4 +175,64 @@ table th {
   text-align: center;
   font-weight: bold;
   margin-bottom: 10px;
+}
+
+.rounded-navbar {
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
+  background-color: #ffffff; /* White background to contrast with light grey */
+  padding: 20px;
+  border-radius: 20px;
+}
+.navbar-brand img {
+  transition: transform 0.3s; /* Smooth transition */
+}
+.navbar-brand img:hover {
+  transform: scale(1.1); /* Zoom effect on hover */
+}
+.nav-item a {
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+.nav-item a:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.profile-img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 2px solid #333;
+  object-fit: cover;
+}
+
+.profile-info {
+  list-style-type: none;
+  padding: 0;
+}
+
+.profile-info li {
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+.news-item {
+  margin-top: 30px;
+  border-top: 2px solid #ddd;
+  padding-top: 20px;
+}
+
+.news-title {
+  font-size: 1.5rem;
+  font-weight: bold;
 }

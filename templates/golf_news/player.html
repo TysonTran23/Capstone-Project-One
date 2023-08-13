@@ -1,19 +1,66 @@
 {% extends 'base.html' %} {% block content %}
-<h1>{{player.FirstName}} {{player.LastName}}</h1>
-<img src="{{player.PhotoUrl}}" alt="" />
 
-<ul>
-    <li>{{player.BirthCity}}, {{player.BirthState}} {{player.Country}}</li>
-    <li>College: {{player.College}}</li>
-    <li>Swings: {{player.Swings}}</li>
-    <li>Weight: {{player.Weight}}</li>
-    <li>PgaDebut: {{player.Weight}}</li>
-</ul>
-<h2>Current News</h2>
-{% for item in news %}
-<h4>{{item.Title}}</h4>
-<p>{{item.Updated}}</p>
-<p>Sources: <a href="{{item.OriginalSourceUrl}}">{{item.OriginalSource}}</a>, <a href="{{item.Url}}">{{item.Source}}</a></p>
-<p>{{item.Content}}</p>
-{% endfor %}
+<div class="container mt-4">
+  <div class="row">
+    <!-- Profile Section -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center">
+          <img
+            src="{{player.PhotoUrl}}"
+            alt="{{player.FirstName}} {{player.LastName}}"
+            class="img-fluid rounded-circle mb-3"
+            style="max-width: 200px"
+          />
+          <h3 class="card-title">{{player.FirstName}} {{player.LastName}}</h3>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item border-0 py-1">
+              <i class="fas fa-map-marker-alt"></i> {{player.BirthCity}},
+              {{player.BirthState}} {{player.Country}}
+            </li>
+            <li class="list-group-item border-0 py-1">
+              <i class="fas fa-school"></i> College: {{player.College}}
+            </li>
+            <li class="list-group-item border-0 py-1">
+              <i class="fas fa-golf-ball"></i> Swings: {{player.Swings}}
+            </li>
+            <li class="list-group-item border-0 py-1">
+              <i class="fas fa-weight"></i> Weight: {{player.Weight}} lbs
+            </li>
+            <li class="list-group-item border-0 py-1">
+              <i class="fas fa-calendar-alt"></i> Pga Debut: {{player.PgaDebut}}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- News Section -->
+    <div class="col-md-8">
+
+      {% for item in news %}
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title">{{item.Title}}</h4>
+          <p class="card-text"><strong>Updated:</strong> {{item.Updated}}</p>
+          <p class="card-text">
+            Sources:
+            <a
+              href="{{item.OriginalSourceUrl}}"
+              target="_blank"
+              class="text-decoration-none"
+              >{{item.OriginalSource}}</a
+            >,
+            <a href="{{item.Url}}" target="_blank" class="text-decoration-none"
+              >{{item.Source}}</a
+            >
+          </p>
+          <p class="card-text">{{item.Content}}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
 {% endblock %}
