@@ -1,6 +1,43 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
 
-{% block content %}
-<h1>Welcome to Golf Stat Tracker</h1>
-<h2>This website is used to track your golf stats and keep track of progress and your handicap</h2>
+<h1 class="text-center mb-5">Welcome to Golf Stat Tracker</h1>
+<p class="lead text-center mb-5">
+  Track your golf stats, monitor your progress, and keep up with the latest golf
+  news.
+</p>
+
+<div class="container mt-5">
+  <div class="row">
+    {% set sections = [ {"image": "golf_news.png", "alt": "Golf News", "title":
+    "Golf News", "desc": "Stay updated with the latest happenings in the golfing
+    world."}, {"image": "golf_stats.png", "alt": "Golf Stats", "title": "Golf
+    Stats", "desc": "Monitor your performance and get insights into your
+    game."}, {"image": "golf_stats2.png", "alt": "Golf Stats Overview", "title":
+    "Stats Overview", "desc": "Dive deep into your statistics and compare
+    against past performances."}, {"image": "leaderboard.png", "alt":
+    "Leaderboard", "title": "Leaderboard", "desc": "Check out top performers and
+    see where you stand among peers."}, {"image": "previous_rounds.png", "alt":
+    "Previous Rounds", "title": "Previous Rounds", "desc": "Review your past
+    rounds and learn from your game history."}, {"image": "profile.png", "alt":
+    "Profile", "title": "Your Profile", "desc": "Manage your account and
+    personalize your Golf Stat Tracker experience."}, {"image": "rankings.png",
+    "alt": "Rankings", "title": "Rankings", "desc": "Discover top players
+    globally and see how you measure up."} ] %} {% for section in sections %}
+    <div class="col-md-4 mb-5">
+      <div class="card h-100 shadow-sm">
+        <img
+          src="/static/pictures/{{ section.image }}"
+          alt="{{ section.alt }}"
+          class="card-img-top"
+        />
+        <div class="card-body">
+          <h5 class="card-title">{{ section.title }}</h5>
+          <p class="card-text">{{ section.desc }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
 {% endblock %}
