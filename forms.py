@@ -43,7 +43,7 @@ class HoleScoreForm(FlaskForm):
 class AddGolfRoundForm(FlaskForm):
     """Form for adding Golf Round"""
 
-    date_played = DateField("Date Played", validators=[InputRequired()])
+    date_played = DateField("YYYY/MM/DD", validators=[InputRequired()])
     course_name = StringField("Course Name", validators=[InputRequired()])
     hole_count = SelectField(
         "Number of Holes",
@@ -57,7 +57,7 @@ class AddGolfRoundForm(FlaskForm):
 class AddGolfRoundForm18(FlaskForm):
     """Form for adding Golf Round"""
 
-    date_played = DateField("Date Played", validators=[InputRequired()])
+    date_played = DateField("YYYY/MM/DD", validators=[InputRequired()])
     course_name = StringField("Course Name", validators=[InputRequired()])
     hole_count = SelectField(
         "Number of Holes",

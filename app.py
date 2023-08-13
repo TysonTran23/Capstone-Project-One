@@ -235,11 +235,11 @@ def calculate_average_scores(user_id):
     )
 
     return (
-        round(avg_score_18, 2),
-        round(avg_score_9, 2),
-        round(avg_par_3, 2),
-        round(avg_par_4, 2),
-        round(avg_par_5, 2),
+        round(avg_score_18, 2) if avg_score_18 is not None else 0.0,
+        round(avg_score_9, 2) if avg_score_9 is not None else 0.0,
+        round(avg_par_3, 2) if avg_par_3 is not None else 0.0,
+        round(avg_par_4, 2) if avg_par_4 is not None else 0.0,
+        round(avg_par_5, 2) if avg_par_5 is not None else 0.0,
     )
 
 
