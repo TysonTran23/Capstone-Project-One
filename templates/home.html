@@ -1,85 +1,94 @@
 {% extends 'base.html' %} {% block content %}
 <h1>Golf Stat Tracker</h1>
-<h2>This is your golf portfolio</h2>
-<a href="/golf_round/add9">Add New 9 Hole Round</a>
-<a href="/golf_round/add18">Add New 18 Hole Round</a>
-<a href="/golf_round/history">Rounds</a>
-<a href="/golf_news">Golf News</a>
-<div>
-  <p>Last 10 Round Scores: {{last_10_score}}</p>
-  <p>Putts per Round: {{last_10_round_putts}}</p>
-  <p>Fairway %: {{fairway_hit_percentage}}</p>
-  <p>Green in Regulation %: {{green_in_regulation}}</p>
-</div>
-<div class="statistics">
-  <div class="column">
-    <h2>Scoring Analysis</h2>
-    <table>
-      <tr>
-        <th>Category</th>
-        <th>Average Score</th>
-      </tr>
-      <tr>
-        <td>Avg Score (18)</td>
-        <td>{{ avg_scores[0] }}</td>
-      </tr>
-      <tr>
-        <td>Avg Score (9)</td>
-        <td>{{ avg_scores[1] }}</td>
-      </tr>
-      <tr>
-        <td>Par 3 Avg</td>
-        <td>{{ avg_scores[2] }}</td>
-      </tr>
-      <tr>
-        <td>Par 4 Avg</td>
-        <td>{{ avg_scores[3] }}</td>
-      </tr>
-      <tr>
-        <td>Par 5 Avg</td>
-        <td>{{ avg_scores[4] }}</td>
-      </tr>
-    </table>
+
+<div class="row">
+  <!-- Putts per Round Card -->
+  <div class="col-md-6">
+      <div class="card mb-4">
+          <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">Putts per Round</h5>
+          </div>
+          <ul class="list-group list-group-flush">
+              {% for putt in last_10_round_putts %}
+              <li class="list-group-item">
+                  {{ loop.index }}: {{ putt }} putts
+              </li>
+              {% endfor %}
+          </ul>
+      </div>
+  </div>
+
+  <!-- Last 10 Round Scores Card -->
+  <div class="col-md-6">
+      <div class="card">
+          <div class="card-header bg-success text-white">
+              <h5 class="mb-0">Last 10 Round Scores</h5>
+          </div>
+          <ul class="list-group list-group-flush">
+              {% for score in last_10_score %}
+              <li class="list-group-item">
+                  {{ loop.index }}: {{ score }} strokes
+              </li>
+              {% endfor %}
+          </ul>
+      </div>
   </div>
 </div>
-<div class="categories">
-  <h2>Category Counts</h2>
-  <table>
-    <tr>
-      <th>Category</th>
-      <th>Count</th>
-    </tr>
-    <tr>
-      <td>Eagles</td>
-      <td>{{ scores.eagles }}</td>
-    </tr>
-    <tr>
-      <td>Birdies</td>
-      <td>{{ scores.birdies }}</td>
-    </tr>
-    <tr>
-      <td>Pars</td>
-      <td>{{ scores.pars }}</td>
-    </tr>
-    <tr>
-      <td>Bogies</td>
-      <td>{{ scores.bogies }}</td>
-    </tr>
-    <tr>
-      <td>Double Bogies</td>
-      <td>{{ scores.double_bogies }}</td>
-    </tr>
-    <tr>
-      <td>Triples</td>
-      <td>{{ scores.triples }}</td>
-    </tr>
-    <tr>
-      <td>Double Pars</td>
-      <td>{{ scores.double_pars }}</td>
-    </tr>
-  </table>
+
+<!-- Fairway Hit Progress Bar Container -->
+<div class="fairway-progress-container">
+  <!-- Label -->
+  <h5>Fairway Hit Progress</h5>
+
+  <!-- Progress Bar -->
+  <div
+    class="progress"
+    data-toggle="tooltip"
+    title="Percentage of fairways hit during the games."
+  >
+    {% set width_style = "width: " + fairway_hit_percentage|string + "%;" %} {%
+    set bg_color_style = "background-color: " + fairway_hit_percentage_color +
+    ";" %}
+    <div
+      class="progress-bar"
+      role="progressbar"
+      style="{{ width_style }} {{ bg_color_style }}"
+      aria-valuenow="{{ fairway_hit_percentage }}"
+      aria-valuemin="0"
+      aria-valuemax="100"
+    >
+      {{ fairway_hit_percentage }}%
+    </div>
+  </div>
 </div>
+<!-- Greens in Regulation Progress Bar Container -->
+<div class="greens-progress-container">
+  <!-- Label -->
+  <h5>Greens in Regulation Progress</h5>
+
+  <!-- Progress Bar -->
+  <div
+    class="progress"
+    data-toggle="tooltip"
+    title="Percentage of greens hit in regulation during the games."
+  >
+    {% set width_style = "width: " + green_in_regulation|string + "%;" %} {% set
+    bg_color_style = "background-color: " + green_in_regulation_color + ";" %}
+    <div
+      class="progress-bar"
+      role="progressbar"
+      style="{{ width_style }} {{ bg_color_style }}"
+      aria-valuenow="{{ green_in_regulation }}"
+      aria-valuemin="0"
+      aria-valuemax="100"
+    >
+      {{ green_in_regulation }}%
+    </div>
+  </div>
+</div>
+
 <div class="last-5-rounds">
+  <a href="/golf_round/history"><h2>Previous Rounds</h2></a>
   <table>
     <thead>
       <tr>
@@ -106,6 +115,80 @@
     </tbody>
     {% endfor %}
   </table>
+  <div class="round-links">
+    <a href="/golf_round/add9" class="btn-round">Add New 9 Hole Round</a>
+    <a href="/golf_round/add18" class="btn-round">Add New 18 Hole Round</a>
+  </div>
+</div>
+<div class="stats-section">
+  <div class="statistics">
+    <div class="column">
+      <h2>Scoring Analysis</h2>
+      <table>
+        <tr>
+          <th>Category</th>
+          <th>Average Score</th>
+        </tr>
+        <tr>
+          <td>Avg Score (18)</td>
+          <td>{{ avg_scores[0] }}</td>
+        </tr>
+        <tr>
+          <td>Avg Score (9)</td>
+          <td>{{ avg_scores[1] }}</td>
+        </tr>
+        <tr>
+          <td>Par 3 Avg</td>
+          <td>{{ avg_scores[2] }}</td>
+        </tr>
+        <tr>
+          <td>Par 4 Avg</td>
+          <td>{{ avg_scores[3] }}</td>
+        </tr>
+        <tr>
+          <td>Par 5 Avg</td>
+          <td>{{ avg_scores[4] }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="categories">
+    <h2>Category Counts</h2>
+    <table>
+      <tr>
+        <th>Category</th>
+        <th>Count</th>
+      </tr>
+      <tr>
+        <td>Eagles</td>
+        <td>{{ scores.eagles }}</td>
+      </tr>
+      <tr>
+        <td>Birdies</td>
+        <td>{{ scores.birdies }}</td>
+      </tr>
+      <tr>
+        <td>Pars</td>
+        <td>{{ scores.pars }}</td>
+      </tr>
+      <tr>
+        <td>Bogies</td>
+        <td>{{ scores.bogies }}</td>
+      </tr>
+      <tr>
+        <td>Double Bogies</td>
+        <td>{{ scores.double_bogies }}</td>
+      </tr>
+      <tr>
+        <td>Triples</td>
+        <td>{{ scores.triples }}</td>
+      </tr>
+      <tr>
+        <td>Double Pars</td>
+        <td>{{ scores.double_pars }}</td>
+      </tr>
+    </table>
+  </div>
 </div>
 
 {% endblock %}

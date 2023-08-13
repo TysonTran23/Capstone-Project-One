@@ -9,9 +9,9 @@ const blogContainer = document.getElementById("blog-container");
 //Generate HTML/Structure for the News API
 function generateNewsHTML(data) {
   return `
-    <h4>${data.Title}</h4>
-    <p>Source: ${data.OriginalSource}</p>
-    <a href="${data.OriginalSourceUrl}">${data.OriginalSourceUrl}</a>
+    <h4 class="text-center display-6">${data.Title}</h4>
+    <p class="text-center">    <a href="${data.OriginalSourceUrl}">Source: ${data.OriginalSource}</a></p>
+
     <p>${data.Content}</p>
     `;
 }
@@ -119,3 +119,4 @@ getLeaderboard();
 getNextTournament();
 
 /////////////////////////////////////////////////////////////////////////////////////////
+

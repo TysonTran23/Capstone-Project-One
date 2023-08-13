@@ -1,34 +1,66 @@
 {% extends 'base.html' %} {% block content %}
-<h1>Golf News</h1>
-<nav id="golf-news-navbar">
-  <a href="/golf_news/schedule">PGA Tour Schedule</a>
-  <a href="/golf_news/current_leaderboard">Current Leaderboard</a>
-  <a href="/golf_news/world_rankings">World Rankings</a>
+<h1 class="display-2 text-center">Golf News</h1>
+<nav class="navbar navbar-expand-lg" id="golf-news-navbar">
+  <div class="container-fluid justify-content-center">
+    <ul class="navbar-nav justify-content-center">
+      <li class="nav-item">
+        <a
+          href="/golf_news/schedule"
+          class="nav-link active btn btn-outline-primary mr-2"
+          >PGA Tour Schedule</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          href="/golf_news/current_leaderboard"
+          class="nav-link active btn btn-outline-primary mr-2"
+          >Current Leaderboard</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          href="/golf_news/world_rankings"
+          class="nav-link active btn btn-outline-primary mr-2"
+          >World Rankings</a
+        >
+      </li>
+    </ul>
+  </div>
 </nav>
+
 <div id="todays-news-container">
-  <h2>Todays News</h2>
+  <h2 class="text-center display-4">Todays News</h2>
 </div>
-<div id="current-tournament-container">
-  <h2>Current Leaderboard</h2>
-  <h4></h4>
-  <table id="current-tournament-table">
-    <thead>
-      <tr>
-        <th>Position</th>
-        <th>Player</th>
-        <th>Total</th>
-        <th>R1</th>
-        <th>R2</th>
-        <th>R3</th>
-        <th>R4</th>
-      </tr>
-    </thead>
-    <tbody id="leaderboard-body"></tbody>
-  </table>
-</div>
-<div id="next-tournament-container">
-  <h2>Next Tournament</h2>
-  <h4></h4>
-  <ul id="next-tournament-list"></ul>
+
+<div class="container my-4">
+  <div class="row my-4">
+    <div class="col-lg-6">
+      <div id="current-tournament-container">
+        <h2>Current Leaderboard</h2>
+        <h4></h4>
+        <table id="current-tournament-table" class="table table=striped">
+          <thead>
+            <tr>
+              <th>Position</th>
+              <th>Player</th>
+              <th>Total</th>
+              <th>R1</th>
+              <th>R2</th>
+              <th>R3</th>
+              <th>R4</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div id="next-tournament-container">
+        <h2>Next Tournament</h2>
+        <h4></h4>
+        <ul id="next-tournament-list"></ul>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

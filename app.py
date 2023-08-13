@@ -246,20 +246,21 @@ def calculate_average_scores(user_id):
 def scores(user_id):
     golf_rounds = GolfRound.query.filter_by(user_id=g.user.id).all()
 
-    hole_scores_and_pars = (db.session.query(HoleScore.score, HoleScore.par)
-    .join(GolfRound)
-    .filter(GolfRound.user_id == user_id)
-    .all()
+    hole_scores_and_pars = (
+        db.session.query(HoleScore.score, HoleScore.par)
+        .join(GolfRound)
+        .filter(GolfRound.user_id == user_id)
+        .all()
     )
     categories = {
-    "eagles": 0,
-    "birdies": 0,
-    "pars": 0,
-    "bogies": 0,
-    "double_bogies": 0,
-    "triples": 0,
-    "double_pars": 0,
-}
+        "eagles": 0,
+        "birdies": 0,
+        "pars": 0,
+        "bogies": 0,
+        "double_bogies": 0,
+        "triples": 0,
+        "double_pars": 0,
+    }
     for score, par in hole_scores_and_pars:
         score_difference = score - par
 
@@ -280,14 +281,31 @@ def scores(user_id):
 
     return categories
 
+
+def get_progress_color(percentage):
+    red = min(255, 255 - (percentage * 2.55))
+    green = min(255, percentage * 2.55)
+    return f"rgb({int(red)}, {int(green)}, 0)"
+
+
 @app.route("/")
 def home_page():
     if g.user:
-
-        golf_rounds = GolfRound.query.filter_by(user_id=g.user.id).order_by(GolfRound.date_played.desc()).limit(5).all()
+        golf_rounds = (
+            GolfRound.query.filter_by(user_id=g.user.id)
+            .order_by(GolfRound.date_played.desc())
+            .limit(5)
+            .all()
+        )
         for golf_round in golf_rounds:
             golf_round.difference = golf_round.total_score - golf_round.par
 
+        fairway_hit_percentage_color = get_progress_color(
+            calculate_fairway_percentage(g.user.id)
+        )
+        green_in_regulation_color = get_progress_color(
+            calculate_greens_in_regulation(g.user.id)
+        )
 
         return render_template(
             "home.html",
@@ -298,6 +316,8 @@ def home_page():
             avg_scores=calculate_average_scores(g.user.id),
             scores=scores(g.user.id),
             golf_rounds=golf_rounds,
+            fairway_hit_percentage_color=fairway_hit_percentage_color,
+            green_in_regulation_color=green_in_regulation_color,
             time=time.time(),
         )
     else:
@@ -364,7 +384,7 @@ def add_golf_round9():
 
         return redirect("/")
 
-    return render_template("golf_round/add.html", form=form)
+    return render_template("golf_round/add9.html", form=form)
 
 
 @app.route("/golf_round/add18", methods=["GET", "POST"])
@@ -385,7 +405,7 @@ def add_golf_round18():
 
         return redirect("/")
 
-    return render_template("golf_round/add.html", form=form)
+    return render_template("golf_round/add18.html", form=form)
 
 
 @app.route("/golf_round/history")

@@ -1,0 +1,40 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="row justify-content-md-center">
+  <div class="col-md-7 col-lg-5">
+    <h2 class="join-message">{% block title %}Add Your Round!{% endblock %}</h2>
+
+    <form method="POST" id="">
+      {{ form.hidden_tag() }} {% for field in form if field.widget.input_type !=
+      'hidden' and field.name != 'hole_scores' %} {% for error in field.errors
+      %}
+      <span class="text-danger">{{ error }}</span>
+      {% endfor %} {{ field(placeholder=field.label.text, class="form-control")
+      }} {% endfor %}
+    </form>
+  </div>
+</div>
+{{ super() }}
+<!-- this will inject the content from the base form template -->
+<div class="hole-scores">
+  {% for subform in form.hole_scores %} {% set index = loop.index0 % 3 %} {% if
+  index == 0 %}
+  <div class="row mt-2">
+    {% endif %}
+
+    <div class="col-md-4">
+      {{ subform.label }} {{ subform(placeholder=subform.label.text,
+      class="form-control") }} {% for error in subform.errors %}
+      <span class="text-danger">{{ error }}</span>
+      {% endfor %}
+    </div>
+
+    {% if index == 2 or loop.last %}
+  </div>
+  <!-- End of row -->
+  {% endif %} {% endfor %}
+  <button class="btn btn-primary btn-lg btn-block mt-2">
+    {% block button %} Submit {% endblock %}
+  </button>
+</div>
+{% endblock %}
