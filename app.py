@@ -16,11 +16,15 @@ from forms import (
     HoleScoreForm,
     LoginForm,
 )
-from models import GolfRound, Handicap, HoleScore, User, connect_db, db
+from models import GolfRound, HoleScore, User, connect_db, db
 
 CURR_USER_KEY = "curr_user"
+
+# API URL's
 BASE_URL = "https:api.sportsdata.io/golf/v2/json"
 URL_KEY = "key=176964ab9ddb48dea44c9fb38e4adbc8"
+
+# Calculate current Year for API
 CURRENT_YEAR = datetime.datetime.now().year
 
 
@@ -79,6 +83,7 @@ def signup():
     form = AddUserForm()
 
     if form.validate_on_submit():
+        # TRY to signup user
         try:
             user = User.signup(
                 username=form.username.data,
@@ -87,10 +92,12 @@ def signup():
             )
             db.session.commit()
 
+        # If username is already taken, show form, flash error message
         except IntegrityError:
             flash("Username already taken", "danger")
             return render_template("user/signup.html", form=form)
 
+        # If user signup successful, redirect to homepage
         do_login(user)
         return redirect("/")
 
@@ -123,8 +130,9 @@ def login():
 @app.route("/logout")
 def logout():
     """Handle logout of user."""
-    do_logout()
 
+    # Logout function
+    do_logout()
     flash("You have successfully logged out", "success")
 
     return redirect("/login")
@@ -135,18 +143,27 @@ def logout():
 
 def last_10_rounds():
     """Retrieve last 10 rounds of User"""
+
+    # Golf Round filtered by user_id
     rounds = GolfRound.query.filter_by(user_id=g.user.id)
 
+    # return a list of the rounds
     return [round.total_score for round in rounds][-10:]
 
 
 def calculate_fairway_percentage(user_id):
+    """Calculate fairway percentage base off of database"""
+
+    # Grab HoleScore.fairway_hit column
+    # If True, add 1, if False add 0
+    # Sum items, which returns the amount of fairway hits
     fairway_hit_count = (
         db.session.query(func.sum(case([(HoleScore.fairway_hit == True, 1)], else_=0)))
         .join(GolfRound)
         .filter(GolfRound.user_id == user_id)
         .scalar()
     )
+    # Find how much holes played by user
     total_holes_played = (
         db.session.query(func.count(HoleScore.id))
         .join(GolfRound)
@@ -154,14 +171,20 @@ def calculate_fairway_percentage(user_id):
         .scalar()
     )
 
+    # Calculate the percentage of fairway hit
+    # How many fairways player has hit / total holes
     fairway_percentage = (
         (fairway_hit_count / total_holes_played) * 100 if total_holes_played > 0 else 0
     )
 
+    # Return fairway percentage to 2 decimal points
     return round(fairway_percentage, 2)
 
 
 def calculate_greens_in_regulation(user_id):
+    # Grab HoleScore.greens_in_regulation column
+    # If True, add 1, if False add 0
+    # Sum items, which returns the amount of fairway hits
     green_in_regulation = (
         db.session.query(
             func.sum(case([(HoleScore.green_in_regulation == True, 1)], else_=0))
@@ -171,6 +194,7 @@ def calculate_greens_in_regulation(user_id):
         .scalar()
     )
 
+    # Find how much holes played by user
     total_holes_played = (
         db.session.query(func.count(HoleScore.id))
         .join(GolfRound)
@@ -178,6 +202,8 @@ def calculate_greens_in_regulation(user_id):
         .scalar()
     )
 
+    # Calculate the greens in regulation percentage
+    # Number of greens hit / Total holes played by user
     green_in_regulation_percentage = (
         (green_in_regulation / total_holes_played) * 100
         if total_holes_played > 0
@@ -188,6 +214,9 @@ def calculate_greens_in_regulation(user_id):
 
 
 def calculate_putts_per_round(user_id):
+    # Grab HoleScore.putts column
+    # Join and filter by user_id
+    # Group and order from last 10 rounds
     last_10_rounds_putts = (
         db.session.query(func.sum(HoleScore.putts))
         .join(GolfRound)
@@ -198,35 +227,43 @@ def calculate_putts_per_round(user_id):
         .all()
     )
 
+    # The query will return a list of tuples. Each tuple has one element (the total number of putts for a round). This line of code converts that list of one-element tuples into a plain list of integers. For example, it'll convert [(5,), (6,), (7,)] to [5, 6, 7].
     last_10_rounds_putts = [total_putts for (total_putts,) in last_10_rounds_putts]
 
     return last_10_rounds_putts
 
 
 def calculate_average_scores(user_id):
+    """Calculate the AVG SCORE"""
+
+    # Avg score of all Total_Scores
     avg_score_18 = (
         db.session.query(func.avg(GolfRound.total_score))
         .filter(GolfRound.user_id == user_id)
         .scalar()
     )
+    # Avg score of all Total_Scores / 2
     avg_score_9 = (
         db.session.query(func.avg(GolfRound.total_score / 2))
         .filter(GolfRound.user_id == user_id)
         .scalar()
     )
 
+    # Avg Score on Holes that are Par 3's
     avg_par_3 = (
         db.session.query(func.avg(HoleScore.score))
         .join(GolfRound)
         .filter(GolfRound.user_id == user_id, HoleScore.par == 3)
         .scalar()
     )
+    # Avg Score on Holes that are Par 4's
     avg_par_4 = (
         db.session.query(func.avg(HoleScore.score))
         .join(GolfRound)
         .filter(GolfRound.user_id == user_id, HoleScore.par == 4)
         .scalar()
     )
+    # Avg Score on Holes that are Par 5's
     avg_par_5 = (
         db.session.query(func.avg(HoleScore.score))
         .join(GolfRound)
@@ -234,6 +271,7 @@ def calculate_average_scores(user_id):
         .scalar()
     )
 
+    # Return Scores, if None than default to 0.0
     return (
         round(avg_score_18, 2) if avg_score_18 is not None else 0.0,
         round(avg_score_9, 2) if avg_score_9 is not None else 0.0,
@@ -244,14 +282,18 @@ def calculate_average_scores(user_id):
 
 
 def scores(user_id):
+    """Keeps tracks of eagles, birdies, pars, bogies, doubles and triples"""
+
     golf_rounds = GolfRound.query.filter_by(user_id=g.user.id).all()
 
+    # Grabs the columns Score and Par
     hole_scores_and_pars = (
         db.session.query(HoleScore.score, HoleScore.par)
         .join(GolfRound)
         .filter(GolfRound.user_id == user_id)
         .all()
     )
+    # Create a dictionary of stats
     categories = {
         "eagles": 0,
         "birdies": 0,
@@ -261,6 +303,8 @@ def scores(user_id):
         "triples": 0,
         "double_pars": 0,
     }
+    # Calculate the difference
+    # According to result, add 1 to eagles, birdies, pars, etc
     for score, par in hole_scores_and_pars:
         score_difference = score - par
 
@@ -279,10 +323,16 @@ def scores(user_id):
         elif score_difference >= 4:
             categories["double_pars"] += 1
 
+    # Return dictionary of stats
     return categories
 
 
 def get_progress_color(percentage):
+    """This function is used to produce red to green depending on percentags
+    Lower the percentage = Red
+    Higher the percentage = Green
+    """
+
     red = min(255, 255 - (percentage * 2.55))
     green = min(255, percentage * 2.55)
     return f"rgb({int(red)}, {int(green)}, 0)"
@@ -290,7 +340,10 @@ def get_progress_color(percentage):
 
 @app.route("/")
 def home_page():
+    #Makes sure user are signed in before accessing page
     if g.user:
+
+        #Last 5 Rounds and Score to par 
         golf_rounds = (
             GolfRound.query.filter_by(user_id=g.user.id)
             .order_by(GolfRound.date_played.desc())
@@ -300,6 +353,7 @@ def home_page():
         for golf_round in golf_rounds:
             golf_round.difference = golf_round.total_score - golf_round.par
 
+        #Get's progress bar color for fairway and greens hit percentages
         fairway_hit_percentage_color = get_progress_color(
             calculate_fairway_percentage(g.user.id)
         )
@@ -307,6 +361,7 @@ def home_page():
             calculate_greens_in_regulation(g.user.id)
         )
 
+        #Return template and stats from previous functions 
         return render_template(
             "home.html",
             last_10_score=last_10_rounds(),
@@ -320,6 +375,7 @@ def home_page():
             green_in_regulation_color=green_in_regulation_color,
             time=time.time(),
         )
+    #If NOT g.user, return them to the home page
     else:
         return render_template("welcome.html")
 
@@ -369,6 +425,8 @@ def save_hole_scores(golf_round, hole_scores_form, hole_count):
 @app.route("/golf_round/add9", methods=["GET", "POST"])
 def add_golf_round9():
     """Handle User Adding New Golf Round"""
+    
+    #if not logged in 
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
@@ -390,6 +448,7 @@ def add_golf_round9():
 @app.route("/golf_round/add18", methods=["GET", "POST"])
 def add_golf_round18():
     """Handle User Adding New Golf Round (18 HOLES)"""
+
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
@@ -411,6 +470,7 @@ def add_golf_round18():
 @app.route("/golf_round/history")
 def previous_rounds():
     """Show all previous rounds recorded"""
+
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
@@ -427,6 +487,7 @@ def previous_rounds():
 @app.route("/golf_round/<int:golf_round_id>")
 def golf_round_details(golf_round_id):
     """Show detail on specific round"""
+
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
@@ -438,6 +499,7 @@ def golf_round_details(golf_round_id):
 @app.route("/golf_round/<int:golf_round_id>/edit", methods=["GET", "POST"])
 def golf_round_edit(golf_round_id):
     """Edit scores"""
+    
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")

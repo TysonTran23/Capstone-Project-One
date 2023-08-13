@@ -1,8 +1,12 @@
+//API URLS
 const BASE_URL = "https:api.sportsdata.io/golf/v2/json";
 const URL_KEY = "key=176964ab9ddb48dea44c9fb38e4adbc8";
+
+//Dates for API
 const currentDate = new Date();
 const CURRENTYEAR = currentDate.getFullYear();
 
+//Main Golf News Container
 const blogContainer = document.getElementById("blog-container");
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -74,10 +78,13 @@ async function getLeaderboard() {
   tournamentName.text(tournament);
   currentTournament.text(tournament);
 
+  //Only for the first 5 players on the leaderboard
   for (let i = 0; i < 5; i++) {
     let player = $(generateLeaderboardHTML(players[i]));
     $("#leaderboard-body").append(player);
   }
+
+  //Create Leaderboard
   for (let item of players) {
     let player = $(generateLeaderboardHTML(item));
     $("#current-leaderboard-body").append(player);
@@ -95,6 +102,7 @@ function genereateNextTournamentHTML(data) {
   <li>End Date: ${data.EndDate}</li>
   `;
 }
+
 
 async function getNextTournament() {
   const currentTournamentId = 561;
@@ -119,4 +127,3 @@ getLeaderboard();
 getNextTournament();
 
 /////////////////////////////////////////////////////////////////////////////////////////
-

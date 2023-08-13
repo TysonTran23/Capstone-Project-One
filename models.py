@@ -8,16 +8,14 @@ db = SQLAlchemy()
 
 
 class User(db.Model):
-
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    
-    # ... methods ...
 
+    # ... methods ...
 
     @classmethod
     def signup(cls, username, email, password):
@@ -52,7 +50,7 @@ class User(db.Model):
             is_auth = bcrypt.check_password_hash(user.password, password)
             if is_auth:
                 return user
-        
+
         return False
 
     def __repr__(self):
@@ -60,7 +58,6 @@ class User(db.Model):
 
 
 class GolfRound(db.Model):
-
     __tablename__ = "golf_rounds"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -70,10 +67,6 @@ class GolfRound(db.Model):
     par = db.Column(db.Integer, nullable=False)
     total_score = db.Column(db.Integer, nullable=False)
 
-    # putts_count = db.Column(db.Integer)
-    # fairway_hit_count = db.Column(db.Integer)
-    # green_hit_count = db.Column(db.Integer)
-
     hole_scores = db.relationship("HoleScore", backref="golf_round", lazy=True)
 
     def __repr__(self):
@@ -81,7 +74,6 @@ class GolfRound(db.Model):
 
 
 class HoleScore(db.Model):
-
     __tablename__ = "holes"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -100,7 +92,6 @@ class HoleScore(db.Model):
 
 
 class Handicap(db.Model):
-
     __tablename__ = "handicaps"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -109,6 +100,7 @@ class Handicap(db.Model):
 
     def __repr__(self):
         return f"<User #{self.user_id} Handicap: {self.value}>"
+
 
 def connect_db(app):
     db.app = app
